@@ -31,7 +31,7 @@ App::App(std::vector<AlgoSpec> algoSpecs, std::vector<GenSpec> genSpecs)
 
 void App::regen_flow() {
     auto gen = gens_[active_gen_index_].make();
-    points = gen->generate(600,
+    points = gen->generate(50,
                            static_cast<float>(WIN_W),
                            static_cast<float>(WIN_H));
     have_data = !points.empty();
