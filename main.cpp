@@ -12,8 +12,8 @@
 
 int main() {
     std::vector<AlgoSpec> algoSpecs;
-    algoSpecs.emplace_back([] { return std::make_unique<Quickhull>(); }); //TODO: change to AndrewAlogrithm
-    algoSpecs.emplace_back([] { return std::make_unique<AndrewAlgorithm>(); }); //TODO: change to QuickHull
+    algoSpecs.emplace_back([] { return std::make_unique<Quickhull>(); });
+    algoSpecs.emplace_back([] { return std::make_unique<AndrewAlgorithm>(); });
 
     std::vector<GenSpec> genSpecs;
     genSpecs.push_back(GenSpec{ [] { return std::make_unique<RandomGenerator>(); } });

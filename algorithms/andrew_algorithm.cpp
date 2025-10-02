@@ -39,6 +39,10 @@ std::vector<int> AndrewAlgorithm::run_full() {
     if (m == 0) return {};
     if (m == 1) return {order_[0]};
 
+    const int L = order_.front();
+    const int R = order_.back();
+
+    // lower chain from L to R
     std::vector<int> lower;
     lower.reserve(m);
     for (int idx : order_) {
@@ -50,11 +54,20 @@ std::vector<int> AndrewAlgorithm::run_full() {
         }
         lower.push_back(idx);
     }
+    // drop R to avoid duplicate when concatenating
+    if (!lower.empty()) lower.pop_back();
 
+    // mark lower indices to skip during upper, except extremes
+    std::vector<char> in_lower(points_.size(), 0);
+    for (int id : lower) in_lower[id] = 1;
+
+    // upper chain from R to L, skip any index already in lower, allow L
     std::vector<int> upper;
     upper.reserve(m);
-    for (int t = m - 1; t >= 0; --t) {
-        int idx = order_[t];
+    for (int k = m - 1; k >= 0; --k) {
+        int idx = order_[k];
+        if (in_lower[idx] && idx != L) continue; // skip reused interior points
+
         while (static_cast<int>(upper.size()) >= 2) {
             int a = upper[static_cast<int>(upper.size()) - 2];
             int b = upper[static_cast<int>(upper.size()) - 1];
@@ -63,8 +76,7 @@ std::vector<int> AndrewAlgorithm::run_full() {
         }
         upper.push_back(idx);
     }
-
-    if (!lower.empty()) lower.pop_back();
+    // drop L to avoid duplicate when concatenating
     if (!upper.empty()) upper.pop_back();
 
     std::vector<int> hull;
@@ -73,6 +85,7 @@ std::vector<int> AndrewAlgorithm::run_full() {
     hull.insert(hull.end(), upper.begin(), upper.end());
     return hull;
 }
+
 
 core::HullFrame AndrewAlgorithm::make_frame(const char* label,
                                             int a, int b, int c,
@@ -112,6 +125,9 @@ void AndrewAlgorithm::build_frames() {
         return;
     }
 
+    const int L = order_.front();
+    const int R = order_.back();
+
     std::vector<int> lower;
     std::vector<int> upper;
     lower.reserve(m);
@@ -119,7 +135,7 @@ void AndrewAlgorithm::build_frames() {
 
     frames_.push_back(make_frame("Start lower chain", -1, -1, -1, lower, upper));
 
-    // lower
+    // lower chain
     for (int idx : order_) {
         while (static_cast<int>(lower.size()) >= 2) {
             int a = lower[static_cast<int>(lower.size()) - 2];
@@ -139,12 +155,18 @@ void AndrewAlgorithm::build_frames() {
 
     frames_.push_back(make_frame("Start upper chain", -1, -1, -1, lower, upper));
 
-    // do not repeat rightmost when concatenating
+    // drop R to avoid duplicate when concatenating
     if (!lower.empty()) lower.pop_back();
 
-    // upper
+    // mark lower indices so upper pass skips them, except L
+    std::vector<char> in_lower(points_.size(), 0);
+    for (int id : lower) in_lower[id] = 1;
+
+    // upper chain, iterate reversed sorted order, skip reused interior points
     for (int t = m - 1; t >= 0; --t) {
         int idx = order_[t];
+        if (in_lower[idx] && idx != L) continue;
+
         while (static_cast<int>(upper.size()) >= 2) {
             int a = upper[static_cast<int>(upper.size()) - 2];
             int b = upper[static_cast<int>(upper.size()) - 1];
@@ -161,13 +183,13 @@ void AndrewAlgorithm::build_frames() {
         frames_.push_back(make_frame("Add to upper", a, b, -1, lower, upper));
     }
 
-    // do not repeat leftmost when concatenating
+    // drop L to avoid duplicate when concatenating
     if (!upper.empty()) upper.pop_back();
 
-    // final composed hull
     core::HullFrame done = make_frame("Done", -1, -1, -1, lower, upper);
     frames_.push_back(std::move(done));
 }
+
 
 void AndrewAlgorithm::begin_stepping() {
     build_frames();
