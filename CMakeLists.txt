@@ -17,8 +17,6 @@ add_executable(convex_hull
         visualizer/renderer.h
         visualizer/app.cpp
         visualizer/app.h
-        algorithms/mock.cpp
-        algorithms/mock.h
         generators/point_generator.cpp
         generators/point_generator.h
         generators/random_generator.cpp
@@ -29,6 +27,10 @@ add_executable(convex_hull
         generators/square_generator.h
         generators/line_generator.cpp
         generators/line_generator.h
+        algorithms/andrew_algorithm.cpp
+        algorithms/andrew_algorithm.h
+        algorithms/quickhull.cpp
+        algorithms/quickhull.h
 )
 
 target_include_directories(convex_hull PRIVATE

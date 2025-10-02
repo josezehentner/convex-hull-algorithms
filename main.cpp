@@ -1,5 +1,6 @@
 #include "visualizer/app.h"
-#include "algorithms/mock.h"
+#include "algorithms/quickhull.h"
+#include "algorithms/andrew_algorithm.h"
 #include "core/stopwatch.h"
 #include "generators/circle_generator.h"
 #include "generators/line_generator.h"
@@ -11,8 +12,8 @@
 
 int main() {
     std::vector<AlgoSpec> algoSpecs;
-    algoSpecs.emplace_back([] { return std::make_unique<MockHull>(); }); //TODO: change to AndrewAlogrithm
-    algoSpecs.emplace_back([] { return std::make_unique<MockHull>(); }); //TODO: change to QuickHull
+    algoSpecs.emplace_back([] { return std::make_unique<Quickhull>(); }); //TODO: change to AndrewAlogrithm
+    algoSpecs.emplace_back([] { return std::make_unique<AndrewAlgorithm>(); }); //TODO: change to QuickHull
 
     std::vector<GenSpec> genSpecs;
     genSpecs.push_back(GenSpec{ [] { return std::make_unique<RandomGenerator>(); } });
